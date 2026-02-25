@@ -1,131 +1,91 @@
-# Bike Sharing Demand Prediction using Linear Regression
+# Bike Sharing Demand Prediction
 
-## Project Overview
-
-You build a linear regression model to predict daily bike rentals using weather and calendar features.
-
-You use the UCI Bike Sharing dataset and apply statistical modeling with `statsmodels`.
-
----
-
-## Objective
-
-Predict the daily count of rented bikes using:
-
-* Season
-* Holiday indicator
-* Workday indicator
-* Weather condition
-* Temperature
-* Humidity
-* Wind speed
-* Lag feature from two days before
-
----
+Linear Regression and Decision Tree 
 
 ## Dataset
 
 Source: UCI Machine Learning Repository
-Dataset: Bike Sharing Dataset
-
 File used: `day.csv`
+Processed dataset: 728 daily observations
 
-The dataset contains 728 processed daily observations after cleaning.
+Target variable: `cnt`
 
----
+Features used:
 
-## Data Preprocessing
-
-You performed the following steps:
-
-* Selected relevant features
-* Mapped season and weather codes to readable labels
-* Renamed columns for clarity
-* Created lag feature `cnt_2d_bfr` using `shift(2)`
-* Removed rows with missing values
-* Removed unrealistic humidity values
-* Applied one hot encoding to categorical variables
-* Added intercept term for regression
+* season
+* holiday
+* workingday
+* weathersit
+* temp
+* hum
+* windspeed
+* lag feature `cnt_2d_bfr`
 
 ---
 
-## Model
+## Preprocessing
 
-Model used: Ordinary Least Squares Linear Regression
+* Selected relevant variables
+* Created lag feature using `shift(2)`
+* Removed missing rows
+* Applied one hot encoding for linear regression
+* Added intercept for OLS
 
+The lag feature was introduced to capture temporal dependency.
+
+---
+
+## Model 1: Linear Regression
+
+Method: Ordinary Least Squares
 Library: `statsmodels`
 
-Regression equation:
-
-cnt = β0 + β1X1 + β2X2 + ... + ε
-
----
-
-## Results
+Results:
 
 * R² = 0.756
 * Adjusted R² = 0.753
-* Model statistically significant
 
-Key findings:
+Key insight:
 
-* Temperature strongly increases bike rentals
-* Wind speed strongly decreases rentals
-* Humidity negatively affects rentals
-* Workdays increase rentals
-* Lag feature is the strongest predictor
-* Weather conditions significantly impact demand
+Lag demand and temperature are the strongest predictors. Weather and humidity significantly influence rentals.
 
 ---
 
-## Model Diagnostics
+## Model 2: Decision Tree Regressor
 
-You evaluated:
+Library: `scikit-learn`
+Parameters: `max_depth=5`, `min_samples_leaf=10`
 
-* Actual vs Predicted plot
-* Residual plot
-* Residual distribution
-* Feature weight visualization
+Results:
 
-Findings:
+* R² without lag ≈ 0.53
+* R² with lag ≈ 0.67
 
-* Strong linear relationship
-* Residuals centered around zero
-* Slight heteroscedasticity at high rental values
-* Assumptions reasonably satisfied
+Feature importance:
 
----
+* `cnt_2d_bfr` dominant
+* temperature second
+* humidity and windspeed moderate
 
-## How to Run
-
-1. Install dependencies
-
-```
-pip install -r requirements.txt
-```
-
-2. Open the notebook
-
-```
-bike_sharing_linear_regression.ipynb
-```
-
-3. Run all cells
+The tree captures nonlinear relationships but underperforms compared to linear regression.
 
 ---
 
-## Requirements
+## Model Comparison
 
-* pandas
-* numpy
-* matplotlib
-* statsmodels
+| Model             | R²    |
+| ----------------- | ----- |
+| Linear Regression | 0.756 |
+| Decision Tree     | 0.671 |
+
+Linear regression performs better on this dataset. The decision tree provides rule based interpretability.
 
 ---
 
 ## Conclusion
 
-The linear regression model explains a substantial portion of variability in daily bike rentals.
+Bike rental demand shows strong temporal persistence. Including lag features significantly improves performance.
 
-Weather, temperature, and temporal dependency play major roles in demand.
+Linear regression achieved higher predictive accuracy. Decision trees provided interpretable rule based structure.
 
+---
