@@ -1,73 +1,114 @@
 # Bike Sharing Demand Prediction
 
-Linear Regression and Decision Tree 
+This project compares Linear Regression, Decision Tree, and RuleFit models to predict daily bike rental demand using the UCI Bike Sharing dataset.
+
+---
 
 ## Dataset
 
-Source: UCI Machine Learning Repository
-File used: `day.csv`
-Processed dataset: 728 daily observations
+File: `day.csv`
+Observations after preprocessing: 729
 
-Target variable: `cnt`
+Target variable:
+`cnt` → total daily rentals
 
-Features used:
+Predictors:
 
 * season
+* yr
+* mnth
 * holiday
+* weekday
 * workingday
 * weathersit
 * temp
+* atemp
 * hum
 * windspeed
 * lag feature `cnt_2d_bfr`
+
+The lag feature was created using `shift(2)` to model temporal persistence.
 
 ---
 
 ## Preprocessing
 
-* Selected relevant variables
-* Created lag feature using `shift(2)`
+* Sorted dataset chronologically
+* Created lag feature with shift(2)
 * Removed missing rows
-* Applied one hot encoding for linear regression
-* Added intercept for OLS
-
-The lag feature was introduced to capture temporal dependency.
+* Dropped leakage variables
+* Applied one hot encoding for OLS
+* Added intercept for linear regression
 
 ---
 
 ## Model 1: Linear Regression
 
 Method: Ordinary Least Squares
-Library: `statsmodels`
 
-Results:
+R² = 0.756
+Adjusted R² = 0.753
 
-* R² = 0.756
-* Adjusted R² = 0.753
+Observations:
 
-Key insight:
+* Lag demand is the strongest predictor
+* Temperature has a positive and significant effect
+* Weather condition and humidity significantly impact rentals
 
-Lag demand and temperature are the strongest predictors. Weather and humidity significantly influence rentals.
+The model captures global linear trends but does not model nonlinear interactions.
 
 ---
 
 ## Model 2: Decision Tree Regressor
 
-Library: `scikit-learn`
-Parameters: `max_depth=5`, `min_samples_leaf=10`
+Parameters:
+max_depth = 5
+min_samples_leaf = 10
 
-Results:
+R² without lag ≈ 0.53
+R² with lag ≈ 0.67
 
-* R² without lag ≈ 0.53
-* R² with lag ≈ 0.67
+Observations:
 
-Feature importance:
+* `cnt_2d_bfr` dominates importance
+* Temperature is second most important
+* Captures nonlinear relationships
 
-* `cnt_2d_bfr` dominant
-* temperature second
-* humidity and windspeed moderate
+Performance improves with lag but remains below linear regression.
 
-The tree captures nonlinear relationships but underperforms compared to linear regression.
+---
+
+## Model 3: RuleFit
+
+Tree generator: Gradient Boosting
+n_estimators = 300
+max_depth = 3
+L1 regularization enabled by default
+
+1289 candidate rules generated
+273 retained after L1 regularization
+
+Performance:
+
+R² = 0.98
+RMSE ≈ 270
+
+Top features by importance:
+
+1. temp
+2. hum
+3. atemp
+4. windspeed
+5. yr
+
+Interpretation:
+
+* Temperature is the dominant driver of bike demand
+* Humidity and perceived temperature strongly influence usage
+* Wind speed negatively affects rentals
+* Temporal persistence contributes but is secondary to weather
+
+RuleFit achieves high predictive accuracy while maintaining interpretability through sparse rule selection.
 
 ---
 
@@ -77,15 +118,15 @@ The tree captures nonlinear relationships but underperforms compared to linear r
 | ----------------- | ----- |
 | Linear Regression | 0.756 |
 | Decision Tree     | 0.671 |
+| RuleFit           | 0.980 |
 
-Linear regression performs better on this dataset. The decision tree provides rule based interpretability.
-
----
-
-## Conclusion
-
-Bike rental demand shows strong temporal persistence. Including lag features significantly improves performance.
-
-Linear regression achieved higher predictive accuracy. Decision trees provided interpretable rule based structure.
+RuleFit substantially outperforms the other models on training performance.
 
 ---
+
+## Key Insights
+
+* Weather conditions are the primary drivers of demand
+* Temperature is consistently the strongest predictor
+* Including lag features improves all models
+* Hybrid rule based modeling captures nonlinear structure effectively
