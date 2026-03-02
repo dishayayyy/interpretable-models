@@ -194,32 +194,13 @@ Core modules used:
 
 ---
 
-# Project Structure
-
-```
-├── data/
-│   ├── day.csv
-│   ├── breast_cancer.csv
-│
-├── notebooks/
-│   ├── linear_regression.ipynb
-│   ├── decision_tree.ipynb
-│   ├── rulefit.ipynb
-│   ├── logistic_regression.ipynb
-│
-├── README.md
-└── requirements.txt
-```
-
----
-
 # Installation
 
 Clone the repository:
 
 ```
-git clone <your_repo_link>
-cd <repo_name>
+git clone <https://github.com/dishayayyy/interpretable-models>
+cd <interpretable-models>
 ```
 
 Create environment:
